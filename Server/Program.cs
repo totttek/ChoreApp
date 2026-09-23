@@ -52,6 +52,24 @@ chores.MapPatch("/{id}", async (int id, ChorePatchDto input, ChoreAppDbContext d
 	return Results.NoContent();
 });
 
+chores.MapPatch("/{id}/completion", async (int id, ChoreCompPatchDTO input, ChoreAppDbContext db) =>
+{
+	var chore = await db.Chores.FindAsync(id);
+	if (chore is null) return Results.NotFound();
+
+	var user = await db.Users.FindAsync(input.AssignedUserId);
+	if (user is null) return Results.NotFound();
+
+	chore.IsComplete = true;
+	chore.CompletedAt = DateTime.UtcNow;
+	chore.AssignedUserId = input.AssignedUserId;
+
+	user.Xp += chore.XpReward;
+
+	await db.SaveChangesAsync();
+	return Results.NoContent();
+});
+
 chores.MapDelete("/{id}", async (int id, ChoreAppDbContext db) =>
 {
 	if (await db.Chores.FindAsync(id) is not Chore chore) return Results.NotFound();

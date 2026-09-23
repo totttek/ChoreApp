@@ -16,7 +16,7 @@ class ChoreAppDbContext : DbContext
 			.HasMany<User>()
 			.WithOne()
 			.HasForeignKey(user => user.HouseholdId)
-			.OnDelete(DeleteBehavior.Cascade);
+			.OnDelete(DeleteBehavior.SetNull);
 
 		modelBuilder.Entity<Household>()
 			.HasMany<Chore>()
